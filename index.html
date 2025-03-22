@@ -4,38 +4,92 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Keep Websites Alive</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      color: #333;
+    }
+    .log {
+      margin-top: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #fff;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .log-entry {
+      margin-bottom: 10px;
+      padding: 8px;
+      border-bottom: 1px solid #ddd;
+    }
+    .success {
+      color: green;
+    }
+    .error {
+      color: red;
+    }
+  </style>
 </head>
 <body>
-  <h1>Keep Alive Script</h1>
-  <p>This script will send a request to multiple Render-hosted websites every 2 minutes.</p>
+  <h1>Keep Websites Alive</h1>
+  <p>This script sends requests to multiple Render-hosted websites every 10 minutes and logs the results below.</p>
+
+  <div class="log" id="logContainer">
+    <!-- Logs will appear here -->
+  </div>
 
   <script>
     // List of URLs to ping
     const targetUrls = [
       "https://onekychub.onrender.com", 
-      "https://fundgaze.onrender.com/", 
-    //   "https://your-third-website.onrender.com" // Add more URLs here
+      "https://fundgaze.onrender.com", 
     ];
+
+    const logContainer = document.getElementById('logContainer');
 
     // Function to send a GET request to each URL
     function keepAlive() {
       targetUrls.forEach(url => {
         fetch(url)
           .then(response => {
+            const logEntry = document.createElement('div');
+            logEntry.classList.add('log-entry');
             if (response.ok) {
-              console.log(`[${new Date().toLocaleTimeString()}] Successfully pinged ${url}`);
+              logEntry.classList.add('success');
+              logEntry.textContent = `[${new Date().toLocaleTimeString()}] Successfully pinged ${url}`;
             } else {
-              console.error(`[${new Date().toLocaleTimeString()}] Failed to ping ${url}. Status: ${response.status}`);
+              logEntry.classList.add('error');
+              logEntry.textContent = `[${new Date().toLocaleTimeString()}] Failed to ping ${url}. Status: ${response.status}`;
             }
+            addLogEntry(logEntry);
           })
           .catch(error => {
-            console.error(`[${new Date().toLocaleTimeString()}] Error pinging ${url}:`, error);
+            const logEntry = document.createElement('div');
+            logEntry.classList.add('log-entry', 'error');
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] Error pinging ${url}: ${error.message}`;
+            addLogEntry(logEntry);
           });
       });
     }
 
-    // Call the function every 2 minutes (120000 milliseconds)
-    setInterval(keepAlive, 120000);
+    // Function to add a log entry and ensure only the latest 10 entries are displayed
+    function addLogEntry(entry) {
+      logContainer.prepend(entry); // Add the new log entry to the top
+
+      // Remove older entries if there are more than 10
+      while (logContainer.children.length > 10) {
+        logContainer.removeChild(logContainer.lastChild);
+      }
+    }
+
+    // Call the function every 10 minutes (600000 milliseconds)
+    setInterval(keepAlive, 600000);
 
     // Initial call to start immediately
     keepAlive();
