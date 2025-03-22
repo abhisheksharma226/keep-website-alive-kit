@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Keep Websites Alive</title>
+</head>
+<body>
+  <h1>Keep Alive Script</h1>
+  <p>This script will send a request to multiple Render-hosted websites every 2 minutes.</p>
+
+  <script>
+    // List of URLs to ping
+    const targetUrls = [
+      "https://onekychub.onrender.com", 
+      "https://fundgaze.onrender.com/", 
+    //   "https://your-third-website.onrender.com" // Add more URLs here
+    ];
+
+    // Function to send a GET request to each URL
+    function keepAlive() {
+      targetUrls.forEach(url => {
+        fetch(url)
+          .then(response => {
+            if (response.ok) {
+              console.log(`[${new Date().toLocaleTimeString()}] Successfully pinged ${url}`);
+            } else {
+              console.error(`[${new Date().toLocaleTimeString()}] Failed to ping ${url}. Status: ${response.status}`);
+            }
+          })
+          .catch(error => {
+            console.error(`[${new Date().toLocaleTimeString()}] Error pinging ${url}:`, error);
+          });
+      });
+    }
+
+    // Call the function every 2 minutes (120000 milliseconds)
+    setInterval(keepAlive, 120000);
+
+    // Initial call to start immediately
+    keepAlive();
+  </script>
+</body>
+</html>
